@@ -4,18 +4,21 @@ kind: Service
 metadata:  
   name: test-react-service
 spec:
-  externalIPs:
-  - **.**.***.**
-  //replace with your K8S IP here
-  ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 80
+  replicas: 1
   selector:
-    app: test-react-service
-  type: LoadBalancer
-status:
-  loadBalancer: {}
+    matchLabels:
+      app: webui
+  template:
+    metadata:
+      labels:
+        app: webui
+    spec:
+      containers:
+      - name: webui
+        image: 127.0.0.1:30000/webui:v0.1
+        ports:
+          - name: http-port
+            containerPort: 80
 
 ---
 
