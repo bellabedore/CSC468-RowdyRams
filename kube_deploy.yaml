@@ -1,0 +1,47 @@
+# React Service
+apiVersion: v1
+kind: Service
+metadata:  
+  name: test-react-service
+spec:
+  externalIPs:
+  - **.**.***.**
+  //replace with your K8S IP here
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: test-react-service
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+
+---
+
+# React Instance
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-react-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-react-service
+  template:
+    metadata:
+      labels:
+        app: test-react-service
+    spec:
+      containers:
+      - name: react-test-image
+        image: "react-image:v.$BUILD_NUMBER" // This will publish to docker hub .. BUILD_NUMBER is dynamic versioning from Jenkins
+        ports:
+            - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
